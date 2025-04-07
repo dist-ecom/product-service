@@ -74,10 +74,7 @@ describe('Products (e2e)', () => {
     });
 
     it('should return 401 when no token is provided', async () => {
-      await request(app.getHttpServer())
-        .post('/products')
-        .send(mockProduct)
-        .expect(401);
+      await request(app.getHttpServer()).post('/products').send(mockProduct).expect(401);
     });
 
     it('should return 403 when user token is provided', async () => {
@@ -106,9 +103,7 @@ describe('Products (e2e)', () => {
     it('should return all products', async () => {
       await productModel.create(mockProduct);
 
-      const response = await request(app.getHttpServer())
-        .get('/products')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/products').expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toBe(1);
@@ -116,9 +111,7 @@ describe('Products (e2e)', () => {
     });
 
     it('should return empty array when no products exist', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/products')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/products').expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toBe(0);
@@ -138,15 +131,11 @@ describe('Products (e2e)', () => {
     });
 
     it('should return 404 when product is not found', async () => {
-      await request(app.getHttpServer())
-        .get('/products/999999999999999999999999')
-        .expect(404);
+      await request(app.getHttpServer()).get('/products/999999999999999999999999').expect(404);
     });
 
     it('should validate product id format', async () => {
-      await request(app.getHttpServer())
-        .get('/products/invalid-id')
-        .expect(400);
+      await request(app.getHttpServer()).get('/products/invalid-id').expect(400);
     });
   });
 
@@ -209,9 +198,7 @@ describe('Products (e2e)', () => {
 
     it('should return 401 when no token is provided', async () => {
       const product = await productModel.create(mockProduct);
-      await request(app.getHttpServer())
-        .delete(`/products/${product._id}`)
-        .expect(401);
+      await request(app.getHttpServer()).delete(`/products/${product._id}`).expect(401);
     });
 
     it('should return 403 when user token is provided', async () => {
@@ -305,4 +292,4 @@ describe('Products (e2e)', () => {
       expect(response.body[0].tags).toEqual(expect.arrayContaining(mockProduct.tags));
     });
   });
-}); 
+});

@@ -155,4 +155,4 @@ describe('ProductsController', () => {
       expect(service.findByTags).toHaveBeenCalledWith(tags);
     });
   });
-}); 
+});

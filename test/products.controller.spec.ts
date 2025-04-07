@@ -117,9 +117,7 @@ describe('ProductsController', () => {
   describe('search', () => {
     it('should search products', async () => {
       const query = 'test';
-      const expectedProducts = [
-        { _id: mockProductId, ...generateMockProduct() },
-      ];
+      const expectedProducts = [{ _id: mockProductId, ...generateMockProduct() }];
 
       mockProductsService.search.mockResolvedValue(expectedProducts);
 
@@ -163,4 +161,4 @@ describe('ProductsController', () => {
       expect(mockProductsService.findByTags).toHaveBeenCalledWith(tags);
     });
   });
-}); 
+});

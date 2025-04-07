@@ -74,7 +74,7 @@ export async function setupTestDatabase() {
 
 export async function teardownTestDatabase(moduleFixture: TestingModule) {
   if (!moduleFixture) return;
-  
+
   const productModel = moduleFixture.get<Model<Product>>(getModelToken(Product.name));
   const elasticsearchService = moduleFixture.get<ElasticsearchService>(ElasticsearchService);
 
@@ -82,4 +82,4 @@ export async function teardownTestDatabase(moduleFixture: TestingModule) {
   await productModel.deleteMany({});
   await elasticsearchService.delete({ index: 'products', id: mockProductId }).catch(() => {});
   await moduleFixture.close();
-} 
+}

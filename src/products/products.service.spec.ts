@@ -247,4 +247,4 @@ describe('ProductsService', () => {
       expect(result).toEqual(products);
     });
   });
-}); 
+});

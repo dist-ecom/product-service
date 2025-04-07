@@ -15,10 +15,10 @@ async function setupTestDatabase() {
 
     // Create test database
     const db = client.db('product-service-test');
-    
+
     // Create collections
     await db.createCollection('products');
-    
+
     // Create indexes
     await db.collection('products').createIndex({ name: 1 });
     await db.collection('products').createIndex({ category: 1 });
@@ -39,7 +39,7 @@ setupTestDatabase()
     console.log('Test database setup successful');
     process.exit(0);
   })
-  .catch((error) => {
+  .catch(error => {
     console.error('Test database setup failed:', error);
     process.exit(1);
-  }); 
+  });

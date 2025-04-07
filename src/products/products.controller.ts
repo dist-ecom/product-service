@@ -16,7 +16,14 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { Product } from './schemas/product.schema';
 
 @ApiTags('products')
@@ -29,7 +36,11 @@ export class ProductsController {
   @Post()
   @Roles('admin')
   @ApiOperation({ summary: 'Create a new product' })
-  @ApiResponse({ status: 201, description: 'The product has been successfully created.', type: Product })
+  @ApiResponse({
+    status: 201,
+    description: 'The product has been successfully created.',
+    type: Product,
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin access required.' })
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
@@ -53,7 +64,11 @@ export class ProductsController {
   @Get('category/:category')
   @ApiOperation({ summary: 'Get products by category' })
   @ApiParam({ name: 'category', description: 'Product category' })
-  @ApiResponse({ status: 200, description: 'Return products in the specified category.', type: [Product] })
+  @ApiResponse({
+    status: 200,
+    description: 'Return products in the specified category.',
+    type: [Product],
+  })
   findByCategory(@Param('category') category: string) {
     return this.productsService.findByCategory(category);
   }
@@ -61,7 +76,11 @@ export class ProductsController {
   @Get('tags')
   @ApiOperation({ summary: 'Get products by tags' })
   @ApiQuery({ name: 'tags', description: 'Product tags', type: [String] })
-  @ApiResponse({ status: 200, description: 'Return products with the specified tags.', type: [Product] })
+  @ApiResponse({
+    status: 200,
+    description: 'Return products with the specified tags.',
+    type: [Product],
+  })
   findByTags(@Query('tags', new ParseArrayPipe({ items: String })) tags: string[]) {
     return this.productsService.findByTags(tags);
   }
@@ -79,7 +98,11 @@ export class ProductsController {
   @Roles('admin')
   @ApiOperation({ summary: 'Update a product' })
   @ApiParam({ name: 'id', description: 'Product id' })
-  @ApiResponse({ status: 200, description: 'The product has been successfully updated.', type: Product })
+  @ApiResponse({
+    status: 200,
+    description: 'The product has been successfully updated.',
+    type: Product,
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin access required.' })
   @ApiResponse({ status: 404, description: 'Product not found.' })
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
@@ -96,4 +119,4 @@ export class ProductsController {
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);
   }
-} 
+}

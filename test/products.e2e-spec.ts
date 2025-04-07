@@ -39,13 +39,13 @@ describe('ProductsController (e2e)', () => {
     configService = moduleFixture.get<ConfigService>(ConfigService);
     elasticsearchService = esService;
     productModel = moduleFixture.get<Model<ProductDocument>>(getModelToken(Product.name));
-    
+
     // Generate auth token
     authToken = jwtService.sign(
       { sub: 'test-user-id', email: 'test@example.com' },
-      { secret: configService.get<string>('JWT_SECRET') }
+      { secret: configService.get<string>('JWT_SECRET') },
     );
-    
+
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
 
@@ -74,7 +74,7 @@ describe('ProductsController (e2e)', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .send(createProductDto)
         .expect(201)
-        .expect((res) => {
+        .expect(res => {
           expect(res.body).toHaveProperty('_id');
           expect(res.body.name).toBe(createProductDto.name);
           expect(res.body.description).toBe(createProductDto.description);
@@ -87,10 +87,7 @@ describe('ProductsController (e2e)', () => {
     it('should return 401 when not authenticated', () => {
       const createProductDto = generateMockProduct();
 
-      return request(app.getHttpServer())
-        .post('/products')
-        .send(createProductDto)
-        .expect(401);
+      return request(app.getHttpServer()).post('/products').send(createProductDto).expect(401);
     });
   });
 
@@ -100,16 +97,14 @@ describe('ProductsController (e2e)', () => {
         .get('/products')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
-        .expect((res) => {
+        .expect(res => {
           expect(Array.isArray(res.body)).toBe(true);
           expect(res.body.length).toBeGreaterThan(0);
         });
     });
 
     it('should return 401 when not authenticated', () => {
-      return request(app.getHttpServer())
-        .get('/products')
-        .expect(401);
+      return request(app.getHttpServer()).get('/products').expect(401);
     });
   });
 
@@ -119,7 +114,7 @@ describe('ProductsController (e2e)', () => {
         .get(`/products/${mockProductId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
-        .expect((res) => {
+        .expect(res => {
           expect(res.body).toHaveProperty('_id');
           expect(res.body).toHaveProperty('name');
           expect(res.body).toHaveProperty('description');
@@ -130,9 +125,7 @@ describe('ProductsController (e2e)', () => {
     });
 
     it('should return 401 when not authenticated', () => {
-      return request(app.getHttpServer())
-        .get(`/products/${mockProductId}`)
-        .expect(401);
+      return request(app.getHttpServer()).get(`/products/${mockProductId}`).expect(401);
     });
 
     it('should return 404 when product not found', () => {
@@ -152,7 +145,7 @@ describe('ProductsController (e2e)', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .send(updateProductDto)
         .expect(200)
-        .expect((res) => {
+        .expect(res => {
           expect(res.body).toHaveProperty('_id');
           expect(res.body.name).toBe(updateProductDto.name);
           expect(res.body.description).toBe(updateProductDto.description);
@@ -191,9 +184,7 @@ describe('ProductsController (e2e)', () => {
     });
 
     it('should return 401 when not authenticated', () => {
-      return request(app.getHttpServer())
-        .delete(`/products/${mockProductId}`)
-        .expect(401);
+      return request(app.getHttpServer()).delete(`/products/${mockProductId}`).expect(401);
     });
 
     it('should return 404 when product not found', () => {
@@ -212,7 +203,7 @@ describe('ProductsController (e2e)', () => {
         .get(`/products/search?q=${query}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
-        .expect((res) => {
+        .expect(res => {
           expect(Array.isArray(res.body)).toBe(true);
           expect(res.body.length).toBeGreaterThan(0);
         });
@@ -221,9 +212,7 @@ describe('ProductsController (e2e)', () => {
     it('should return 401 when not authenticated', () => {
       const query = 'test';
 
-      return request(app.getHttpServer())
-        .get(`/products/search?q=${query}`)
-        .expect(401);
+      return request(app.getHttpServer()).get(`/products/search?q=${query}`).expect(401);
     });
   });
 
@@ -235,7 +224,7 @@ describe('ProductsController (e2e)', () => {
         .get(`/products/category/${category}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
-        .expect((res) => {
+        .expect(res => {
           expect(Array.isArray(res.body)).toBe(true);
           expect(res.body.length).toBeGreaterThan(0);
         });
@@ -244,9 +233,7 @@ describe('ProductsController (e2e)', () => {
     it('should return 401 when not authenticated', () => {
       const category = 'Test Category';
 
-      return request(app.getHttpServer())
-        .get(`/products/category/${category}`)
-        .expect(401);
+      return request(app.getHttpServer()).get(`/products/category/${category}`).expect(401);
     });
   });
 
@@ -258,7 +245,7 @@ describe('ProductsController (e2e)', () => {
         .get(`/products/tags?tags=${tags.join(',')}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
-        .expect((res) => {
+        .expect(res => {
           expect(Array.isArray(res.body)).toBe(true);
           expect(res.body.length).toBeGreaterThan(0);
         });
@@ -272,4 +259,4 @@ describe('ProductsController (e2e)', () => {
         .expect(401);
     });
   });
-}); 
+});

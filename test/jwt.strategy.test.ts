@@ -20,4 +20,4 @@ export class TestJwtStrategy extends PassportStrategy(Strategy) {
       role: payload.role,
     };
   }
-} 
+}

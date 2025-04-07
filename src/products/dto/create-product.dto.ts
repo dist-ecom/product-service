@@ -36,4 +36,4 @@ export class CreateProductDto {
   @IsObject()
   @IsOptional()
   metadata?: Record<string, any>;
-} 
+}

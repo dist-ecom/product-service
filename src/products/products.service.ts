@@ -24,7 +24,7 @@ export class ProductsService {
   async create(createProductDto: CreateProductDto): Promise<Product> {
     const createdProduct = new this.productModel(createProductDto);
     const savedProduct = await createdProduct.save();
-    
+
     // Index the product in Elasticsearch
     await this.elasticsearchService.index({
       index: 'products',
@@ -57,7 +57,7 @@ export class ProductsService {
     const updatedProduct = await this.productModel
       .findByIdAndUpdate(id, updateProductDto, { new: true })
       .exec();
-    
+
     if (!updatedProduct) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
@@ -103,8 +103,8 @@ export class ProductsService {
     });
 
     return hits.hits
-      .filter((hit) => hit._source)
-      .map((hit) => ({
+      .filter(hit => hit._source)
+      .map(hit => ({
         _id: hit._id,
         name: hit._source!.name,
         description: hit._source!.description,
@@ -121,4 +121,4 @@ export class ProductsService {
   async findByTags(tags: string[]): Promise<Product[]> {
     return this.productModel.find({ tags: { $in: tags } }).exec();
   }
-} 
+}
