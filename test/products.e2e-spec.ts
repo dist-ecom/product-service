@@ -15,6 +15,9 @@ import { setupTestDatabase, teardownTestDatabase } from './test-db.setup';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
+import { getModelToken } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Product, ProductDocument } from '../src/products/schemas/product.schema';
 
 describe('ProductsController (e2e)', () => {
   let app: INestApplication;
@@ -25,6 +28,7 @@ describe('ProductsController (e2e)', () => {
   let adminToken: string;
   let elasticsearchService: ElasticsearchService;
   let moduleFixture: TestingModule;
+  let productModel: Model<ProductDocument>;
 
   beforeAll(async () => {
     // Set up test database and get module fixture
@@ -34,6 +38,7 @@ describe('ProductsController (e2e)', () => {
     jwtService = moduleFixture.get<JwtService>(JwtService);
     configService = moduleFixture.get<ConfigService>(ConfigService);
     elasticsearchService = esService;
+    productModel = moduleFixture.get<Model<ProductDocument>>(getModelToken(Product.name));
     
     // Generate auth token
     authToken = jwtService.sign(
@@ -47,6 +52,12 @@ describe('ProductsController (e2e)', () => {
     // Generate tokens for testing
     userToken = mockAuthService.generateUserToken(mockUserId);
     adminToken = mockAuthService.generateAdminToken(mockAdminId);
+  });
+
+  beforeEach(async () => {
+    // Clear the database before each test
+    await productModel.deleteMany({});
+    await elasticsearchService.delete({ index: 'products', id: '*' }).catch(() => {});
   });
 
   afterAll(async () => {
