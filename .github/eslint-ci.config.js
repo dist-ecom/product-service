@@ -2,7 +2,8 @@
 // This is identical to the main eslint.config.js except it's guaranteed to be used in the CI environment
 const globals = require('globals');
 const js = require('@eslint/js');
-const tseslint = require('typescript-eslint');
+const tseslint = require('@typescript-eslint/eslint-plugin');
+const tseslintParser = require('@typescript-eslint/parser');
 const prettierConfig = require('eslint-config-prettier');
 
 module.exports = [
@@ -22,10 +23,10 @@ module.exports = [
   {
     files: ['**/*.ts'],
     plugins: {
-      '@typescript-eslint': tseslint.plugin,
+      '@typescript-eslint': tseslint,
     },
     languageOptions: {
-      parser: tseslint.parser,
+      parser: tseslintParser,
       parserOptions: {
         project: 'tsconfig.json',
       },
@@ -56,7 +57,6 @@ module.exports = [
       '@typescript-eslint/require-await': 'off',
       
       // Important to catch unused variables but with reasonable exceptions
-      // Changed to be more lenient by downgrading from warn to off
       'no-unused-vars': 'off', // Turn off base rule
       '@typescript-eslint/no-unused-vars': ['warn', { 
         'argsIgnorePattern': '^_|req|res|next|args|context|info',

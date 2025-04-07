@@ -31,6 +31,7 @@ jobs:
     - name: Run linting
       run: |
         echo "Running ESLint with CI configuration..."
+        npm install -D @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-config-prettier
         npx eslint --config .github/eslint-ci.config.js "{src,apps,libs,test}/**/*.ts" --max-warnings 0
     
     - name: Run tests
