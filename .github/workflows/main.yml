@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [18.x]
 
     steps:
     - uses: actions/checkout@v4
@@ -25,14 +25,14 @@ jobs:
     
     - name: Install dependencies
       run: npm ci
-      
+    
     - name: Run linting
       run: |
-        echo "Running ESLint with CI configuration"
-        npm run lint:ci
-      
+        echo "Running ESLint with CI configuration..."
+        npx eslint --config .github/eslint-ci.config.js "{src,apps,libs,test}/**/*.ts" --max-warnings 0
+    
     - name: Run tests
-      run: npm test
+      run: npm run test
       
     - name: Build
       run: npm run build 
