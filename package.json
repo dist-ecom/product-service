@@ -20,7 +20,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "test:db:setup": "ts-node test/setup-test-db.ts"
+    "test:db:setup": "ts-node test/setup-test-db.ts",
+    "generate:admin-token": "ts-node src/scripts/generate-admin-token.ts"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.17.1",
