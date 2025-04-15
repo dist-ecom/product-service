@@ -3,7 +3,8 @@ import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, ForbiddenException } from '@nestjs/common';
+import { UserServiceClient } from '../auth/user-service.client';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -16,6 +17,7 @@ describe('ProductsController', () => {
     price: 100,
     category: 'Test Category',
     tags: ['test', 'product'],
+    merchantId: 'merchant-123'
   };
 
   const mockProductsService = {
@@ -27,6 +29,22 @@ describe('ProductsController', () => {
     search: jest.fn(),
     findByCategory: jest.fn(),
     findByTags: jest.fn(),
+    findByMerchant: jest.fn(),
+  };
+
+  // Mock UserServiceClient
+  const mockUserServiceClient = {
+    validateToken: jest.fn(),
+    getUserById: jest.fn(),
+    checkUserVerificationStatus: jest.fn().mockResolvedValue(true)
+  };
+
+  // Mock request object with user
+  const mockRequest = {
+    user: {
+      id: 'merchant-123',
+      role: 'MERCHANT'
+    }
   };
 
   beforeEach(async () => {
@@ -37,6 +55,10 @@ describe('ProductsController', () => {
           provide: ProductsService,
           useValue: mockProductsService,
         },
+        {
+          provide: UserServiceClient,
+          useValue: mockUserServiceClient,
+        }
       ],
     }).compile();
 
@@ -60,10 +82,14 @@ describe('ProductsController', () => {
 
       mockProductsService.create.mockResolvedValue(mockProduct);
 
-      const result = await controller.create(createProductDto);
+      const result = await controller.create(createProductDto, mockRequest);
 
       expect(result).toEqual(mockProduct);
-      expect(service.create).toHaveBeenCalledWith(createProductDto);
+      expect(service.create).toHaveBeenCalledWith(
+        createProductDto, 
+        mockRequest.user.id,
+        mockRequest.user.role
+      );
     });
   });
 
@@ -105,16 +131,27 @@ describe('ProductsController', () => {
       const updatedProduct = { ...mockProduct, ...updateProductDto };
       mockProductsService.update.mockResolvedValue(updatedProduct);
 
-      const result = await controller.update('1', updateProductDto);
+      const result = await controller.update('1', updateProductDto, mockRequest);
 
       expect(result).toEqual(updatedProduct);
-      expect(service.update).toHaveBeenCalledWith('1', updateProductDto);
+      expect(service.update).toHaveBeenCalledWith(
+        '1',
+        updateProductDto,
+        mockRequest.user.id,
+        mockRequest.user.role
+      );
     });
 
     it('should throw NotFoundException when product is not found', async () => {
       mockProductsService.update.mockRejectedValue(new NotFoundException());
 
-      await expect(controller.update('999', {})).rejects.toThrow(NotFoundException);
+      await expect(controller.update('999', {}, mockRequest)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw ForbiddenException when merchant tries to update another merchant\'s product', async () => {
+      mockProductsService.update.mockRejectedValue(new ForbiddenException());
+
+      await expect(controller.update('1', {}, mockRequest)).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -122,15 +159,25 @@ describe('ProductsController', () => {
     it('should remove a product', async () => {
       mockProductsService.remove.mockResolvedValue(undefined);
 
-      await controller.remove('1');
+      await controller.remove('1', mockRequest);
 
-      expect(service.remove).toHaveBeenCalledWith('1');
+      expect(service.remove).toHaveBeenCalledWith(
+        '1',
+        mockRequest.user.id,
+        mockRequest.user.role
+      );
     });
 
     it('should throw NotFoundException when product is not found', async () => {
       mockProductsService.remove.mockRejectedValue(new NotFoundException());
 
-      await expect(controller.remove('999')).rejects.toThrow(NotFoundException);
+      await expect(controller.remove('999', mockRequest)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw ForbiddenException when merchant tries to delete another merchant\'s product', async () => {
+      mockProductsService.remove.mockRejectedValue(new ForbiddenException());
+
+      await expect(controller.remove('1', mockRequest)).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -170,6 +217,19 @@ describe('ProductsController', () => {
 
       expect(result).toEqual(products);
       expect(service.findByTags).toHaveBeenCalledWith(tags);
+    });
+  });
+
+  describe('findByMerchant', () => {
+    it('should return products by merchant', async () => {
+      const merchantId = 'merchant-123';
+      const products = [mockProduct];
+      mockProductsService.findByMerchant.mockResolvedValue(products);
+
+      const result = await controller.findByMerchant(merchantId);
+
+      expect(result).toEqual(products);
+      expect(service.findByMerchant).toHaveBeenCalledWith(merchantId);
     });
   });
 });
