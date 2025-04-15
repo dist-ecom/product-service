@@ -25,6 +25,10 @@ export class Product {
   @Prop({ required: true })
   category: string;
 
+  @ApiProperty({ description: 'The ID of the merchant who owns this product' })
+  @Prop()
+  merchantId: string;
+
   @ApiPropertyOptional({ description: 'Tags associated with the product', type: [String] })
   @Prop([String])
   tags: string[];

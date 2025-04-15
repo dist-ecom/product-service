@@ -3,6 +3,8 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { UserServiceClient } from './user-service.client';
+import { VerifiedUserGuard } from './guards/verified-user.guard';
 
 @Module({
   imports: [
@@ -16,7 +18,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       inject: [ConfigService],
     }),
   ],
-  providers: [JwtStrategy],
-  exports: [JwtModule],
+  providers: [JwtStrategy, UserServiceClient, VerifiedUserGuard],
+  exports: [JwtModule, UserServiceClient, VerifiedUserGuard],
 })
 export class AuthModule {}

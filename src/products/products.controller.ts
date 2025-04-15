@@ -9,6 +9,7 @@ import {
   Query,
   ParseArrayPipe,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -16,6 +17,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import {
   ApiTags,
   ApiOperation,
@@ -32,8 +34,8 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard, VerifiedUserGuard)
+  @Roles('admin', 'merchant')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new product' })
   @ApiResponse({
@@ -41,9 +43,9 @@ export class ProductsController {
     description: 'The product has been successfully created.',
     type: Product,
   })
-  @ApiResponse({ status: 403, description: 'Forbidden - Admin access required.' })
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+  @ApiResponse({ status: 403, description: 'Forbidden - Only verified merchants and admins can create products.' })
+  create(@Body() createProductDto: CreateProductDto, @Request() req) {
+    return this.productsService.create(createProductDto, req.user.id, req.user.role);
   }
 
   @Get()
@@ -73,6 +75,18 @@ export class ProductsController {
     return this.productsService.findByCategory(category);
   }
 
+  @Get('merchant/:merchantId')
+  @ApiOperation({ summary: 'Get products by merchant' })
+  @ApiParam({ name: 'merchantId', description: 'Merchant ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return products from the specified merchant.',
+    type: [Product],
+  })
+  findByMerchant(@Param('merchantId') merchantId: string) {
+    return this.productsService.findByMerchant(merchantId);
+  }
+
   @Get('tags')
   @ApiOperation({ summary: 'Get products by tags' })
   @ApiQuery({ name: 'tags', description: 'Product tags', type: [String] })
@@ -95,8 +109,8 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard, VerifiedUserGuard)
+  @Roles('admin', 'merchant')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a product' })
   @ApiParam({ name: 'id', description: 'Product id' })
@@ -105,22 +119,22 @@ export class ProductsController {
     description: 'The product has been successfully updated.',
     type: Product,
   })
-  @ApiResponse({ status: 403, description: 'Forbidden - Admin access required.' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Only verified merchants and admins can update products.' })
   @ApiResponse({ status: 404, description: 'Product not found.' })
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(id, updateProductDto);
+  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto, @Request() req) {
+    return this.productsService.update(id, updateProductDto, req.user.id, req.user.role);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard, VerifiedUserGuard)
+  @Roles('admin', 'merchant')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a product' })
   @ApiParam({ name: 'id', description: 'Product id' })
   @ApiResponse({ status: 200, description: 'The product has been successfully deleted.' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Admin access required.' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Only verified merchants and admins can delete products.' })
   @ApiResponse({ status: 404, description: 'Product not found.' })
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(id);
+  remove(@Param('id') id: string, @Request() req) {
+    return this.productsService.remove(id, req.user.id, req.user.role);
   }
 }

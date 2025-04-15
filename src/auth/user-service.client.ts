@@ -37,4 +37,16 @@ export class UserServiceClient {
       throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async checkUserVerificationStatus(id: string) {
+    try {
+      const response = await axios.get(`${this.baseUrl}/users/verification/status/${id}`);
+      return response.data.isVerified;
+    } catch (error) {
+      if (error.response?.status === 404) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 } 

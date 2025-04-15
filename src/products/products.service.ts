@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
@@ -12,6 +12,7 @@ interface ElasticsearchProduct {
   price: number;
   category: string;
   tags: string[];
+  merchantId: string;
 }
 
 @Injectable()
@@ -21,8 +22,14 @@ export class ProductsService {
     private readonly elasticsearchService: ElasticsearchService,
   ) {}
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
-    const createdProduct = new this.productModel(createProductDto);
+  async create(createProductDto: CreateProductDto, userId: string, userRole: string): Promise<Product> {
+    // Set the merchantId for the product
+    const productData = {
+      ...createProductDto,
+      merchantId: userRole.toUpperCase() === 'MERCHANT' ? userId : null
+    };
+
+    const createdProduct = new this.productModel(productData);
     const savedProduct = await createdProduct.save();
 
     // Index the product in Elasticsearch
@@ -35,6 +42,7 @@ export class ProductsService {
         price: savedProduct.price,
         category: savedProduct.category,
         tags: savedProduct.tags,
+        merchantId: savedProduct.merchantId
       },
     });
 
@@ -53,14 +61,21 @@ export class ProductsService {
     return product;
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
+  async update(id: string, updateProductDto: UpdateProductDto, userId: string, userRole: string): Promise<Product> {
+    const product = await this.productModel.findById(id).exec();
+    
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    // Check if the user is authorized to update the product
+    if (userRole.toUpperCase() === 'MERCHANT' && product.merchantId !== userId) {
+      throw new ForbiddenException('You do not have permission to update this product');
+    }
+
     const updatedProduct = await this.productModel
       .findByIdAndUpdate(id, updateProductDto, { new: true })
       .exec();
-
-    if (!updatedProduct) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
-    }
 
     // Update the product in Elasticsearch
     await this.elasticsearchService.update({
@@ -72,17 +87,26 @@ export class ProductsService {
         price: updatedProduct.price,
         category: updatedProduct.category,
         tags: updatedProduct.tags,
+        merchantId: updatedProduct.merchantId
       },
     });
 
     return updatedProduct;
   }
 
-  async remove(id: string): Promise<void> {
-    const result = await this.productModel.findByIdAndDelete(id).exec();
-    if (!result) {
+  async remove(id: string, userId: string, userRole: string): Promise<void> {
+    const product = await this.productModel.findById(id).exec();
+    
+    if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
+    
+    // Check if the user is authorized to delete the product
+    if (userRole.toUpperCase() === 'MERCHANT' && product.merchantId !== userId) {
+      throw new ForbiddenException('You do not have permission to delete this product');
+    }
+
+    await this.productModel.findByIdAndDelete(id).exec();
 
     // Remove the product from Elasticsearch
     await this.elasticsearchService.delete({
@@ -111,6 +135,7 @@ export class ProductsService {
         price: hit._source!.price,
         category: hit._source!.category,
         tags: hit._source!.tags,
+        merchantId: hit._source!.merchantId
       }));
   }
 
@@ -120,5 +145,9 @@ export class ProductsService {
 
   async findByTags(tags: string[]): Promise<Product[]> {
     return this.productModel.find({ tags: { $in: tags } }).exec();
+  }
+
+  async findByMerchant(merchantId: string): Promise<Product[]> {
+    return this.productModel.find({ merchantId }).exec();
   }
 }
