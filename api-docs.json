@@ -1,25 +1,779 @@
 {
   "openapi": "3.0.0",
+  "paths": {
+    "/products/auth-test": {
+      "get": {
+        "operationId": "ProductsController_authTest",
+        "summary": "Test endpoint to verify authentication",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Authentication working"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          }
+        },
+        "tags": [
+          "products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/products/verification-test": {
+      "get": {
+        "operationId": "ProductsController_verificationTest",
+        "summary": "Test endpoint to check merchant verification status",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns verification status"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          }
+        },
+        "tags": [
+          "products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/products/token-debug": {
+      "get": {
+        "operationId": "ProductsController_tokenDebug",
+        "summary": "Debug endpoint to test token parsing",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Token parsing result"
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      }
+    },
+    "/products/role-debug": {
+      "get": {
+        "operationId": "ProductsController_roleDebug",
+        "summary": "Debug endpoint to view user role information",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "User role information"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          }
+        },
+        "tags": [
+          "products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/products": {
+      "post": {
+        "operationId": "ProductsController_create",
+        "summary": "Create a new product",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The product has been successfully created.",
+            "schema": {
+              "example": {
+                "_id": "60f5f1d0f6d3f3c8a0f6d3f3",
+                "name": "Wireless Bluetooth Headphones",
+                "description": "High-quality wireless headphones with noise cancellation and 20-hour battery life",
+                "price": 99.99,
+                "category": "Electronics",
+                "merchantId": "60f5f1d0f6d3f3c8a0f6d3f4",
+                "tags": [
+                  "wireless",
+                  "audio",
+                  "bluetooth",
+                  "headphones"
+                ],
+                "images": [
+                  "https://example.com/headphones-1.jpg",
+                  "https://example.com/headphones-2.jpg"
+                ],
+                "isActive": true,
+                "stock": 150,
+                "metadata": {
+                  "color": "Black",
+                  "weight": "250g",
+                  "dimensions": "7.5 x 6.1 x 3.2 inches",
+                  "warranty": "1 year"
+                },
+                "createdAt": "2023-01-15T09:30:00.000Z",
+                "updatedAt": "2023-01-15T09:30:00.000Z"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Only verified merchants and admins can create products."
+          }
+        },
+        "tags": [
+          "products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "ProductsController_findAll",
+        "summary": "Get all products",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return all products.",
+            "schema": {
+              "example": [
+                {
+                  "_id": "60f5f1d0f6d3f3c8a0f6d3f3",
+                  "name": "Wireless Bluetooth Headphones",
+                  "description": "High-quality wireless headphones with noise cancellation and 20-hour battery life",
+                  "price": 99.99,
+                  "category": "Electronics",
+                  "merchantId": "60f5f1d0f6d3f3c8a0f6d3f4",
+                  "tags": [
+                    "wireless",
+                    "audio",
+                    "bluetooth",
+                    "headphones"
+                  ],
+                  "images": [
+                    "https://example.com/headphones-1.jpg",
+                    "https://example.com/headphones-2.jpg"
+                  ],
+                  "isActive": true,
+                  "stock": 150,
+                  "metadata": {
+                    "color": "Black",
+                    "weight": "250g",
+                    "dimensions": "7.5 x 6.1 x 3.2 inches",
+                    "warranty": "1 year"
+                  },
+                  "createdAt": "2023-01-15T09:30:00.000Z",
+                  "updatedAt": "2023-01-15T09:30:00.000Z"
+                }
+              ]
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      }
+    },
+    "/products/search": {
+      "get": {
+        "operationId": "ProductsController_search",
+        "summary": "Search products",
+        "parameters": [
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "description": "Search query",
+            "schema": {
+              "example": "headphones",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return matching products.",
+            "schema": {
+              "example": [
+                {
+                  "_id": "60f5f1d0f6d3f3c8a0f6d3f3",
+                  "name": "Wireless Bluetooth Headphones",
+                  "description": "High-quality wireless headphones with noise cancellation and 20-hour battery life",
+                  "price": 99.99,
+                  "category": "Electronics",
+                  "merchantId": "60f5f1d0f6d3f3c8a0f6d3f4",
+                  "tags": [
+                    "wireless",
+                    "audio",
+                    "bluetooth",
+                    "headphones"
+                  ],
+                  "images": [
+                    "https://example.com/headphones-1.jpg",
+                    "https://example.com/headphones-2.jpg"
+                  ],
+                  "isActive": true,
+                  "stock": 150,
+                  "metadata": {
+                    "color": "Black",
+                    "weight": "250g",
+                    "dimensions": "7.5 x 6.1 x 3.2 inches",
+                    "warranty": "1 year"
+                  },
+                  "createdAt": "2023-01-15T09:30:00.000Z",
+                  "updatedAt": "2023-01-15T09:30:00.000Z"
+                }
+              ]
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      }
+    },
+    "/products/category/{category}": {
+      "get": {
+        "operationId": "ProductsController_findByCategory",
+        "summary": "Get products by category",
+        "parameters": [
+          {
+            "name": "category",
+            "required": true,
+            "in": "path",
+            "description": "Product category",
+            "schema": {
+              "example": "Electronics",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return products in the specified category.",
+            "schema": {
+              "example": [
+                {
+                  "_id": "60f5f1d0f6d3f3c8a0f6d3f3",
+                  "name": "Wireless Bluetooth Headphones",
+                  "description": "High-quality wireless headphones with noise cancellation and 20-hour battery life",
+                  "price": 99.99,
+                  "category": "Electronics",
+                  "merchantId": "60f5f1d0f6d3f3c8a0f6d3f4",
+                  "tags": [
+                    "wireless",
+                    "audio",
+                    "bluetooth",
+                    "headphones"
+                  ],
+                  "images": [
+                    "https://example.com/headphones-1.jpg",
+                    "https://example.com/headphones-2.jpg"
+                  ],
+                  "isActive": true,
+                  "stock": 150,
+                  "metadata": {
+                    "color": "Black",
+                    "weight": "250g",
+                    "dimensions": "7.5 x 6.1 x 3.2 inches",
+                    "warranty": "1 year"
+                  },
+                  "createdAt": "2023-01-15T09:30:00.000Z",
+                  "updatedAt": "2023-01-15T09:30:00.000Z"
+                }
+              ]
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      }
+    },
+    "/products/merchant/{merchantId}": {
+      "get": {
+        "operationId": "ProductsController_findByMerchant",
+        "summary": "Get products by merchant",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "description": "Merchant ID",
+            "schema": {
+              "example": "60f5f1d0f6d3f3c8a0f6d3f4",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return products from the specified merchant.",
+            "schema": {
+              "example": [
+                {
+                  "_id": "60f5f1d0f6d3f3c8a0f6d3f3",
+                  "name": "Wireless Bluetooth Headphones",
+                  "description": "High-quality wireless headphones with noise cancellation and 20-hour battery life",
+                  "price": 99.99,
+                  "category": "Electronics",
+                  "merchantId": "60f5f1d0f6d3f3c8a0f6d3f4",
+                  "tags": [
+                    "wireless",
+                    "audio",
+                    "bluetooth",
+                    "headphones"
+                  ],
+                  "images": [
+                    "https://example.com/headphones-1.jpg",
+                    "https://example.com/headphones-2.jpg"
+                  ],
+                  "isActive": true,
+                  "stock": 150,
+                  "metadata": {
+                    "color": "Black",
+                    "weight": "250g",
+                    "dimensions": "7.5 x 6.1 x 3.2 inches",
+                    "warranty": "1 year"
+                  },
+                  "createdAt": "2023-01-15T09:30:00.000Z",
+                  "updatedAt": "2023-01-15T09:30:00.000Z"
+                }
+              ]
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      }
+    },
+    "/products/tags": {
+      "get": {
+        "operationId": "ProductsController_findByTags",
+        "summary": "Get products by tags",
+        "parameters": [
+          {
+            "name": "tags",
+            "required": true,
+            "in": "query",
+            "description": "Product tags",
+            "schema": {
+              "example": [
+                "wireless",
+                "bluetooth"
+              ],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return products with the specified tags.",
+            "schema": {
+              "example": [
+                {
+                  "_id": "60f5f1d0f6d3f3c8a0f6d3f3",
+                  "name": "Wireless Bluetooth Headphones",
+                  "description": "High-quality wireless headphones with noise cancellation and 20-hour battery life",
+                  "price": 99.99,
+                  "category": "Electronics",
+                  "merchantId": "60f5f1d0f6d3f3c8a0f6d3f4",
+                  "tags": [
+                    "wireless",
+                    "audio",
+                    "bluetooth",
+                    "headphones"
+                  ],
+                  "images": [
+                    "https://example.com/headphones-1.jpg",
+                    "https://example.com/headphones-2.jpg"
+                  ],
+                  "isActive": true,
+                  "stock": 150,
+                  "metadata": {
+                    "color": "Black",
+                    "weight": "250g",
+                    "dimensions": "7.5 x 6.1 x 3.2 inches",
+                    "warranty": "1 year"
+                  },
+                  "createdAt": "2023-01-15T09:30:00.000Z",
+                  "updatedAt": "2023-01-15T09:30:00.000Z"
+                }
+              ]
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "operationId": "ProductsController_findOne",
+        "summary": "Get a product by id",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Product id",
+            "schema": {
+              "example": "60f5f1d0f6d3f3c8a0f6d3f3",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return the product.",
+            "schema": {
+              "example": {
+                "_id": "60f5f1d0f6d3f3c8a0f6d3f3",
+                "name": "Wireless Bluetooth Headphones",
+                "description": "High-quality wireless headphones with noise cancellation and 20-hour battery life",
+                "price": 99.99,
+                "category": "Electronics",
+                "merchantId": "60f5f1d0f6d3f3c8a0f6d3f4",
+                "tags": [
+                  "wireless",
+                  "audio",
+                  "bluetooth",
+                  "headphones"
+                ],
+                "images": [
+                  "https://example.com/headphones-1.jpg",
+                  "https://example.com/headphones-2.jpg"
+                ],
+                "isActive": true,
+                "stock": 150,
+                "metadata": {
+                  "color": "Black",
+                  "weight": "250g",
+                  "dimensions": "7.5 x 6.1 x 3.2 inches",
+                  "warranty": "1 year"
+                },
+                "createdAt": "2023-01-15T09:30:00.000Z",
+                "updatedAt": "2023-01-15T09:30:00.000Z"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found."
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      },
+      "patch": {
+        "operationId": "ProductsController_update",
+        "summary": "Update a product",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Product id",
+            "schema": {
+              "example": "60f5f1d0f6d3f3c8a0f6d3f3",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The product has been successfully updated.",
+            "schema": {
+              "example": {
+                "_id": "60f5f1d0f6d3f3c8a0f6d3f3",
+                "name": "Wireless Bluetooth Headphones",
+                "description": "Updated description with new features: improved noise cancellation and extended 30-hour battery life",
+                "price": 89.99,
+                "category": "Electronics",
+                "merchantId": "60f5f1d0f6d3f3c8a0f6d3f4",
+                "tags": [
+                  "wireless",
+                  "audio",
+                  "bluetooth",
+                  "headphones"
+                ],
+                "images": [
+                  "https://example.com/headphones-1.jpg",
+                  "https://example.com/headphones-2.jpg"
+                ],
+                "isActive": true,
+                "stock": 200,
+                "metadata": {
+                  "color": "Black",
+                  "weight": "250g",
+                  "dimensions": "7.5 x 6.1 x 3.2 inches",
+                  "warranty": "1 year"
+                },
+                "createdAt": "2023-01-15T09:30:00.000Z",
+                "updatedAt": "2023-01-16T14:15:00.000Z"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Only verified merchants and admins can update products."
+          },
+          "404": {
+            "description": "Product not found."
+          }
+        },
+        "tags": [
+          "products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "ProductsController_remove",
+        "summary": "Delete a product",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Product id",
+            "schema": {
+              "example": "60f5f1d0f6d3f3c8a0f6d3f3",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The product has been successfully deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Product deleted successfully",
+                    "id": "60f5f1d0f6d3f3c8a0f6d3f3"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Only verified merchants and admins can delete products."
+          },
+          "404": {
+            "description": "Product not found."
+          }
+        },
+        "tags": [
+          "products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
   "info": {
     "title": "Product Service API",
-    "description": "API documentation for the Product Service",
-    "version": "1.0.0"
+    "description": "The Product Service API description",
+    "version": "1.0",
+    "contact": {}
   },
-  "servers": [
-    {
-      "url": "http://localhost:3000",
-      "description": "Local development server"
-    }
-  ],
+  "tags": [],
+  "servers": [],
   "components": {
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
+      "bearer": {
         "scheme": "bearer",
-        "bearerFormat": "JWT"
+        "bearerFormat": "JWT",
+        "type": "http"
       }
     },
     "schemas": {
+      "CreateProductDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the product",
+            "example": "Wireless Bluetooth Headphones"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of the product",
+            "example": "High-quality wireless headphones with noise cancellation and 20-hour battery life"
+          },
+          "price": {
+            "type": "number",
+            "description": "The price of the product in USD",
+            "example": 99.99
+          },
+          "category": {
+            "type": "string",
+            "description": "The category the product belongs to",
+            "example": "Electronics"
+          },
+          "tags": {
+            "description": "Tags associated with the product",
+            "example": [
+              "wireless",
+              "audio",
+              "bluetooth",
+              "headphones"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "images": {
+            "description": "URLs to product images",
+            "example": [
+              "https://example.com/headphones-1.jpg",
+              "https://example.com/headphones-2.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether the product is currently available for purchase",
+            "example": true
+          },
+          "stock": {
+            "type": "number",
+            "description": "Available quantity in stock",
+            "example": 150
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional product details as key-value pairs",
+            "example": {
+              "color": "Black",
+              "weight": "250g",
+              "dimensions": "7.5 x 6.1 x 3.2 inches",
+              "warranty": "1 year"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "price",
+          "category"
+        ]
+      },
       "Product": {
         "type": "object",
         "properties": {
@@ -43,354 +797,80 @@
             "type": "string",
             "description": "The category of the product"
           },
+          "merchantId": {
+            "type": "string",
+            "description": "The ID of the merchant who owns this product"
+          },
           "tags": {
+            "description": "Tags associated with the product",
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "description": "Tags associated with the product"
+            }
           },
           "images": {
+            "description": "URLs of product images",
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "description": "URLs of product images"
+            }
           },
           "isActive": {
             "type": "boolean",
-            "description": "Whether the product is active",
-            "default": true
+            "description": "Whether the product is active"
           },
           "stock": {
             "type": "number",
-            "description": "Current stock level",
-            "default": 0
+            "description": "Current stock level"
           },
           "metadata": {
             "type": "object",
             "description": "Additional product metadata"
           },
           "createdAt": {
-            "type": "string",
             "format": "date-time",
+            "type": "string",
             "description": "Creation timestamp"
           },
           "updatedAt": {
-            "type": "string",
             "format": "date-time",
+            "type": "string",
             "description": "Last update timestamp"
           }
-        }
+        },
+        "required": [
+          "_id",
+          "name",
+          "description",
+          "price",
+          "category",
+          "merchantId",
+          "isActive",
+          "stock",
+          "createdAt",
+          "updatedAt"
+        ]
       },
-      "CreateProductDto": {
+      "UpdateProductDto": {
         "type": "object",
-        "required": ["name", "description", "price", "category"],
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
           "price": {
             "type": "number",
-            "minimum": 0
+            "description": "Example of a price update",
+            "example": 89.99
           },
-          "category": {
-            "type": "string"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "images": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "isActive": {
-            "type": "boolean"
+          "description": {
+            "type": "string",
+            "description": "Example of a description update",
+            "example": "Updated description with new features: improved noise cancellation and extended 30-hour battery life"
           },
           "stock": {
             "type": "number",
-            "minimum": 0
-          },
-          "metadata": {
-            "type": "object"
-          }
-        }
-      }
-    }
-  },
-  "paths": {
-    "/products": {
-      "get": {
-        "tags": ["products"],
-        "summary": "Get all products",
-        "responses": {
-          "200": {
-            "description": "Return all products",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Product"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": ["products"],
-        "summary": "Create a new product",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateProductDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The product has been successfully created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Product"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - Admin access required"
-          }
-        }
-      }
-    },
-    "/products/search": {
-      "get": {
-        "tags": ["products"],
-        "summary": "Search products",
-        "parameters": [
-          {
-            "name": "q",
-            "in": "query",
-            "description": "Search query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return matching products",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Product"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/products/category/{category}": {
-      "get": {
-        "tags": ["products"],
-        "summary": "Get products by category",
-        "parameters": [
-          {
-            "name": "category",
-            "in": "path",
-            "description": "Product category",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return products in the specified category",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Product"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/products/tags": {
-      "get": {
-        "tags": ["products"],
-        "summary": "Get products by tags",
-        "parameters": [
-          {
-            "name": "tags",
-            "in": "query",
-            "description": "Product tags",
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return products with the specified tags",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Product"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/products/{id}": {
-      "get": {
-        "tags": ["products"],
-        "summary": "Get a product by id",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Product id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return the product",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Product"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Product not found"
-          }
-        }
-      },
-      "patch": {
-        "tags": ["products"],
-        "summary": "Update a product",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Product id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateProductDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The product has been successfully updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Product"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - Admin access required"
-          },
-          "404": {
-            "description": "Product not found"
-          }
-        }
-      },
-      "delete": {
-        "tags": ["products"],
-        "summary": "Delete a product",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Product id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The product has been successfully deleted"
-          },
-          "403": {
-            "description": "Forbidden - Admin access required"
-          },
-          "404": {
-            "description": "Product not found"
+            "description": "Example of a stock update",
+            "example": 200
           }
         }
       }
     }
   }
-} 
+}
