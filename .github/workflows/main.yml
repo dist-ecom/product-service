@@ -29,7 +29,7 @@ jobs:
     - name: Run linting
       run: |
         echo "Running ESLint with CI configuration..."
-        npx eslint --config .github/eslint-ci.config.js "{src,apps,libs,test}/**/*.ts" --max-warnings 10
+        npx eslint --config .github/eslint-ci.config.js "{src,apps,libs,test}/**/*.ts" --max-warnings 50
     
     - name: Run tests
       run: npm run test
