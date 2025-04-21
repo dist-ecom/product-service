@@ -17,7 +17,7 @@ describe('ProductsController', () => {
     price: 100,
     category: 'Test Category',
     tags: ['test', 'product'],
-    merchantId: 'merchant-123'
+    merchantId: 'merchant-123',
   };
 
   const mockProductsService = {
@@ -36,15 +36,15 @@ describe('ProductsController', () => {
   const mockUserServiceClient = {
     validateToken: jest.fn(),
     getUserById: jest.fn(),
-    checkUserVerificationStatus: jest.fn().mockResolvedValue(true)
+    checkUserVerificationStatus: jest.fn().mockResolvedValue(true),
   };
 
   // Mock request object with user
   const mockRequest = {
     user: {
       id: 'merchant-123',
-      role: 'MERCHANT'
-    }
+      role: 'MERCHANT',
+    },
   };
 
   beforeEach(async () => {
@@ -58,7 +58,7 @@ describe('ProductsController', () => {
         {
           provide: UserServiceClient,
           useValue: mockUserServiceClient,
-        }
+        },
       ],
     }).compile();
 
@@ -86,9 +86,9 @@ describe('ProductsController', () => {
 
       expect(result).toEqual(mockProduct);
       expect(service.create).toHaveBeenCalledWith(
-        createProductDto, 
+        createProductDto,
         mockRequest.user.id,
-        mockRequest.user.role
+        mockRequest.user.role,
       );
     });
   });
@@ -138,7 +138,7 @@ describe('ProductsController', () => {
         '1',
         updateProductDto,
         mockRequest.user.id,
-        mockRequest.user.role
+        mockRequest.user.role,
       );
     });
 
@@ -148,7 +148,7 @@ describe('ProductsController', () => {
       await expect(controller.update('999', {}, mockRequest)).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw ForbiddenException when merchant tries to update another merchant\'s product', async () => {
+    it("should throw ForbiddenException when merchant tries to update another merchant's product", async () => {
       mockProductsService.update.mockRejectedValue(new ForbiddenException());
 
       await expect(controller.update('1', {}, mockRequest)).rejects.toThrow(ForbiddenException);
@@ -161,11 +161,7 @@ describe('ProductsController', () => {
 
       await controller.remove('1', mockRequest);
 
-      expect(service.remove).toHaveBeenCalledWith(
-        '1',
-        mockRequest.user.id,
-        mockRequest.user.role
-      );
+      expect(service.remove).toHaveBeenCalledWith('1', mockRequest.user.id, mockRequest.user.role);
     });
 
     it('should throw NotFoundException when product is not found', async () => {
@@ -174,7 +170,7 @@ describe('ProductsController', () => {
       await expect(controller.remove('999', mockRequest)).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw ForbiddenException when merchant tries to delete another merchant\'s product', async () => {
+    it("should throw ForbiddenException when merchant tries to delete another merchant's product", async () => {
       mockProductsService.remove.mockRejectedValue(new ForbiddenException());
 
       await expect(controller.remove('1', mockRequest)).rejects.toThrow(ForbiddenException);

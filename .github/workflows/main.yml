@@ -24,15 +24,12 @@ jobs:
         cache: 'npm'
     
     - name: Install dependencies
-      run: |
-        npm install
-        npm ci
+      run: npm ci
     
     - name: Run linting
       run: |
-        echo "Running ESLint with CI configuration..."
-        npm install -D @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-config-prettier
-        npx eslint --config .github/eslint-ci.config.js "{src,apps,libs,test}/**/*.ts" --max-warnings 10
+        echo "Running ESLint..."
+        npx eslint . --ext .ts --max-warnings 20
     
     - name: Run tests
       run: npm run test

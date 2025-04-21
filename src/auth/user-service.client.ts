@@ -11,11 +11,11 @@ export class UserServiceClient {
 
   constructor(
     private readonly configService: ConfigService,
-    @Inject(REQUEST) private readonly request: any
+    @Inject(REQUEST) private readonly request: any,
   ) {
     this.baseUrl = this.configService.get<string>('USER_SERVICE_URL') || 'http://localhost:3000';
     this.logger.log(`User service base URL: ${this.baseUrl}`);
-    
+
     // Extract authorization token from incoming request if available
     if (this.request && this.request.headers && this.request.headers.authorization) {
       this.authToken = this.request.headers.authorization;
@@ -36,13 +36,18 @@ export class UserServiceClient {
     } catch (error) {
       this.logger.error(`Token validation error: ${error.message}`);
       if (error.response) {
-        this.logger.error(`Response status: ${error.response.status}, data: ${JSON.stringify(error.response.data)}`);
+        this.logger.error(
+          `Response status: ${error.response.status}, data: ${JSON.stringify(error.response.data)}`,
+        );
       }
-      
+
       if (error.response?.status === 401) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
-      throw new HttpException(`User service error: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        `User service error: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -50,19 +55,24 @@ export class UserServiceClient {
     try {
       this.logger.debug(`Getting user by ID: ${id}`);
       const response = await axios.get(`${this.baseUrl}/users/${id}`, {
-        headers: this.authToken ? { Authorization: this.authToken } : {}
+        headers: this.authToken ? { Authorization: this.authToken } : {},
       });
       return response.data;
     } catch (error) {
       this.logger.error(`Get user error: ${error.message}`);
       if (error.response) {
-        this.logger.error(`Response status: ${error.response.status}, data: ${JSON.stringify(error.response.data)}`);
+        this.logger.error(
+          `Response status: ${error.response.status}, data: ${JSON.stringify(error.response.data)}`,
+        );
       }
-      
+
       if (error.response?.status === 404) {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
-      throw new HttpException(`User service error: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        `User service error: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -70,23 +80,28 @@ export class UserServiceClient {
     try {
       this.logger.debug(`Checking verification status for user: ${id}`);
       this.logger.debug(`Using auth token: ${this.authToken ? 'Yes' : 'No'}`);
-      
+
       const response = await axios.get(`${this.baseUrl}/users/verification/status/${id}`, {
-        headers: this.authToken ? { Authorization: this.authToken } : {}
+        headers: this.authToken ? { Authorization: this.authToken } : {},
       });
-      
+
       this.logger.debug(`Verification status result: ${JSON.stringify(response.data)}`);
       return response.data.isVerified;
     } catch (error) {
       this.logger.error(`Verification check error: ${error.message}`);
       if (error.response) {
-        this.logger.error(`Response status: ${error.response.status}, data: ${JSON.stringify(error.response.data)}`);
+        this.logger.error(
+          `Response status: ${error.response.status}, data: ${JSON.stringify(error.response.data)}`,
+        );
       }
-      
+
       if (error.response?.status === 404) {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
-      throw new HttpException(`User service error: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        `User service error: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
-} 
+}

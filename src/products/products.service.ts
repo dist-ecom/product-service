@@ -27,11 +27,15 @@ export class ProductsService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async create(createProductDto: CreateProductDto, userId: string, userRole: string): Promise<Product> {
+  async create(
+    createProductDto: CreateProductDto,
+    userId: string,
+    userRole: string,
+  ): Promise<Product> {
     // Set the merchantId for the product
     const productData = {
       ...createProductDto,
-      merchantId: userRole.toUpperCase() === 'MERCHANT' ? userId : null
+      merchantId: userRole.toUpperCase() === 'MERCHANT' ? userId : null,
     };
 
     const createdProduct = new this.productModel(productData);
@@ -47,13 +51,13 @@ export class ProductsService {
         price: savedProduct.price,
         category: savedProduct.category,
         tags: savedProduct.tags,
-        merchantId: savedProduct.merchantId
+        merchantId: savedProduct.merchantId,
       },
     });
 
     // Invalidate cache for products list
     await this.cacheManager.del('products:all');
-    
+
     return savedProduct;
   }
 
@@ -64,15 +68,15 @@ export class ProductsService {
       this.logger.log('Cache HIT: Retrieved all products from cache');
       return cachedProducts;
     }
-    
+
     this.logger.log('Cache MISS: Fetching all products from database');
     // If not in cache, get from database
     const products = await this.productModel.find().exec();
-    
+
     // Store in cache
     await this.cacheManager.set('products:all', products);
     this.logger.log('Stored all products in cache');
-    
+
     return products;
   }
 
@@ -83,23 +87,28 @@ export class ProductsService {
       this.logger.log(`Cache HIT: Retrieved product ${id} from cache`);
       return cachedProduct;
     }
-    
+
     this.logger.log(`Cache MISS: Fetching product ${id} from database`);
     const product = await this.productModel.findById(id).exec();
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-    
+
     // Store in cache
     await this.cacheManager.set(`product:${id}`, product);
     this.logger.log(`Stored product ${id} in cache`);
-    
+
     return product;
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto, userId: string, userRole: string): Promise<Product> {
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+    userId: string,
+    userRole: string,
+  ): Promise<Product> {
     const product = await this.productModel.findById(id).exec();
-    
+
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
@@ -123,10 +132,10 @@ export class ProductsService {
         price: updatedProduct.price,
         category: updatedProduct.category,
         tags: updatedProduct.tags,
-        merchantId: updatedProduct.merchantId
+        merchantId: updatedProduct.merchantId,
       },
     });
-    
+
     // Invalidate cache
     await this.cacheManager.del(`product:${id}`);
     await this.cacheManager.del('products:all');
@@ -143,11 +152,11 @@ export class ProductsService {
 
   async remove(id: string, userId: string, userRole: string): Promise<void> {
     const product = await this.productModel.findById(id).exec();
-    
+
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-    
+
     // Check if the user is authorized to delete the product
     if (userRole.toUpperCase() === 'MERCHANT' && product.merchantId !== userId) {
       throw new ForbiddenException('You do not have permission to delete this product');
@@ -180,7 +189,7 @@ export class ProductsService {
     if (cachedResults) {
       return cachedResults;
     }
-    
+
     const { hits } = await this.elasticsearchService.search<ElasticsearchProduct>({
       index: 'products',
       query: {
@@ -200,12 +209,12 @@ export class ProductsService {
         price: hit._source!.price,
         category: hit._source!.category,
         tags: hit._source!.tags,
-        merchantId: hit._source!.merchantId
+        merchantId: hit._source!.merchantId,
       }));
-      
+
     // Store in cache with a shorter TTL for search results (e.g., 10 minutes)
     await this.cacheManager.set(cacheKey, results, 600000);
-    
+
     return results;
   }
 
@@ -216,12 +225,12 @@ export class ProductsService {
     if (cachedProducts) {
       return cachedProducts;
     }
-    
+
     const products = await this.productModel.find({ category }).exec();
-    
+
     // Store in cache
     await this.cacheManager.set(cacheKey, products);
-    
+
     return products;
   }
 
@@ -229,18 +238,18 @@ export class ProductsService {
     // For multiple tags, create a composite key
     const tagKey = tags.sort().join(',');
     const cacheKey = `products:tags:${tagKey}`;
-    
+
     // Try to get from cache first
     const cachedProducts = await this.cacheManager.get<Product[]>(cacheKey);
     if (cachedProducts) {
       return cachedProducts;
     }
-    
+
     const products = await this.productModel.find({ tags: { $in: tags } }).exec();
-    
+
     // Store in cache
     await this.cacheManager.set(cacheKey, products);
-    
+
     return products;
   }
 
@@ -251,12 +260,12 @@ export class ProductsService {
     if (cachedProducts) {
       return cachedProducts;
     }
-    
+
     const products = await this.productModel.find({ merchantId }).exec();
-    
+
     // Store in cache
     await this.cacheManager.set(cacheKey, products);
-    
+
     return products;
   }
 }

@@ -13,7 +13,7 @@ import * as redisStore from 'cache-manager-redis-store';
         host: configService.get('REDIS_HOST', 'localhost'),
         port: configService.get('REDIS_PORT', 6379),
         ttl: configService.get('REDIS_TTL', 3600),
-        retry_strategy: function(options) {
+        retry_strategy: function (options) {
           if (options.error && options.error.code === 'ECONNREFUSED') {
             console.error('Redis connection refused. Please check if Redis server is running.');
           }
@@ -26,4 +26,4 @@ import * as redisStore from 'cache-manager-redis-store';
   ],
   exports: [CacheModule],
 })
-export class RedisCacheModule {} 
+export class RedisCacheModule {}

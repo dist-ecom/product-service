@@ -4,21 +4,21 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class CreateProductDto {
   @ApiProperty({
     description: 'The name of the product',
-    example: 'Wireless Bluetooth Headphones'
+    example: 'Wireless Bluetooth Headphones',
   })
   @IsString()
   name: string;
 
   @ApiProperty({
     description: 'Detailed description of the product',
-    example: 'High-quality wireless headphones with noise cancellation and 20-hour battery life'
+    example: 'High-quality wireless headphones with noise cancellation and 20-hour battery life',
   })
   @IsString()
   description: string;
 
   @ApiProperty({
     description: 'The price of the product in USD',
-    example: 99.99
+    example: 99.99,
   })
   @IsNumber()
   @Min(0)
@@ -26,14 +26,14 @@ export class CreateProductDto {
 
   @ApiProperty({
     description: 'The category the product belongs to',
-    example: 'Electronics'
+    example: 'Electronics',
   })
   @IsString()
   category: string;
 
   @ApiPropertyOptional({
     description: 'Tags associated with the product',
-    example: ['wireless', 'audio', 'bluetooth', 'headphones']
+    example: ['wireless', 'audio', 'bluetooth', 'headphones'],
   })
   @IsArray()
   @IsString({ each: true })
@@ -42,7 +42,7 @@ export class CreateProductDto {
 
   @ApiPropertyOptional({
     description: 'URLs to product images',
-    example: ['https://example.com/headphones-1.jpg', 'https://example.com/headphones-2.jpg']
+    example: ['https://example.com/headphones-1.jpg', 'https://example.com/headphones-2.jpg'],
   })
   @IsArray()
   @IsString({ each: true })
@@ -51,7 +51,7 @@ export class CreateProductDto {
 
   @ApiPropertyOptional({
     description: 'Whether the product is currently available for purchase',
-    example: true
+    example: true,
   })
   @IsBoolean()
   @IsOptional()
@@ -59,7 +59,7 @@ export class CreateProductDto {
 
   @ApiPropertyOptional({
     description: 'Available quantity in stock',
-    example: 150
+    example: 150,
   })
   @IsNumber()
   @Min(0)
@@ -72,8 +72,8 @@ export class CreateProductDto {
       color: 'Black',
       weight: '250g',
       dimensions: '7.5 x 6.1 x 3.2 inches',
-      warranty: '1 year'
-    }
+      warranty: '1 year',
+    },
   })
   @IsObject()
   @IsOptional()

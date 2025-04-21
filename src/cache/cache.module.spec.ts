@@ -55,27 +55,27 @@ describe('RedisCacheModule', () => {
     it.skip('should store and retrieve values', async () => {
       const testKey = 'test:key';
       const testValue = { test: 'value' };
-      
+
       await cacheManager.set(testKey, testValue);
       const retrieved = await cacheManager.get(testKey);
-      
+
       expect(retrieved).toEqual(testValue);
     });
 
     it.skip('should respect TTL settings', async () => {
       const testKey = 'test:ttl';
       const testValue = { test: 'ttl-value' };
-      
+
       // Set with a very short TTL (100ms)
       await cacheManager.set(testKey, testValue, 100);
-      
+
       // Value should be available immediately
       let retrieved = await cacheManager.get(testKey);
       expect(retrieved).toEqual(testValue);
-      
+
       // Wait for the TTL to expire
       await new Promise(resolve => setTimeout(resolve, 150));
-      
+
       // Value should be gone
       retrieved = await cacheManager.get(testKey);
       expect(retrieved).toBeUndefined();
@@ -84,19 +84,19 @@ describe('RedisCacheModule', () => {
     it.skip('should delete keys', async () => {
       const testKey = 'test:delete';
       const testValue = { test: 'delete-me' };
-      
+
       await cacheManager.set(testKey, testValue);
-      
+
       // Confirm it was stored
       let retrieved = await cacheManager.get(testKey);
       expect(retrieved).toEqual(testValue);
-      
+
       // Delete it
       await cacheManager.del(testKey);
-      
+
       // Should be gone
       retrieved = await cacheManager.get(testKey);
       expect(retrieved).toBeUndefined();
     });
   });
-}); 
+});

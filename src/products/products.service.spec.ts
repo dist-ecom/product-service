@@ -23,7 +23,7 @@ describe('ProductsService', () => {
     price: 100,
     category: 'Test Category',
     tags: ['test', 'product'],
-    merchantId: 'merchant-123'
+    merchantId: 'merchant-123',
   };
 
   // Create a proper mock for the Mongoose model
@@ -109,7 +109,7 @@ describe('ProductsService', () => {
           price: mockProduct.price,
           category: mockProduct.category,
           tags: mockProduct.tags,
-          merchantId: mockProduct.merchantId
+          merchantId: mockProduct.merchantId,
         },
       });
       // Verify cache invalidation
@@ -120,10 +120,10 @@ describe('ProductsService', () => {
   describe('findAll', () => {
     it('should return products from cache when available', async () => {
       const products = [mockProduct];
-      
+
       // Mock cache hit
       mockCacheManager.get.mockResolvedValue(products);
-      
+
       const result = await service.findAll();
 
       expect(result).toEqual(products);
@@ -133,13 +133,13 @@ describe('ProductsService', () => {
 
     it('should fetch products from database and store in cache when cache misses', async () => {
       const products = [mockProduct];
-      
+
       // Mock cache miss
       mockCacheManager.get.mockResolvedValue(null);
       jest.spyOn(productModel, 'find').mockReturnValue({
         exec: jest.fn().mockResolvedValue(products),
       } as any);
-      
+
       const result = await service.findAll();
 
       expect(result).toEqual(products);
@@ -153,7 +153,7 @@ describe('ProductsService', () => {
     it('should return a product from cache when available', async () => {
       // Mock cache hit
       mockCacheManager.get.mockResolvedValue(mockProduct);
-      
+
       const result = await service.findOne('1');
 
       expect(result).toEqual(mockProduct);
@@ -167,7 +167,7 @@ describe('ProductsService', () => {
       jest.spyOn(productModel, 'findById').mockReturnValue({
         exec: jest.fn().mockResolvedValue(mockProduct),
       } as any);
-      
+
       const result = await service.findOne('1');
 
       expect(result).toEqual(mockProduct);
@@ -197,11 +197,11 @@ describe('ProductsService', () => {
       const userRole = 'MERCHANT';
 
       const updatedProduct = { ...mockProduct, ...updateProductDto };
-      
+
       jest.spyOn(productModel, 'findById').mockReturnValue({
         exec: jest.fn().mockResolvedValue(mockProduct),
       } as any);
-      
+
       jest.spyOn(productModel, 'findByIdAndUpdate').mockReturnValue({
         exec: jest.fn().mockResolvedValue(updatedProduct),
       } as any);
@@ -218,10 +218,10 @@ describe('ProductsService', () => {
           price: updatedProduct.price,
           category: updatedProduct.category,
           tags: updatedProduct.tags,
-          merchantId: updatedProduct.merchantId
+          merchantId: updatedProduct.merchantId,
         },
       });
-      
+
       // Verify cache invalidation
       expect(cacheManager.del).toHaveBeenCalledWith('product:1');
       expect(cacheManager.del).toHaveBeenCalledWith('products:all');
@@ -233,18 +233,22 @@ describe('ProductsService', () => {
         exec: jest.fn().mockResolvedValue(null),
       } as any);
 
-      await expect(service.update('999', {}, 'merchant-123', 'MERCHANT')).rejects.toThrow(NotFoundException);
+      await expect(service.update('999', {}, 'merchant-123', 'MERCHANT')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
-    it('should throw ForbiddenException when merchant tries to update another merchant\'s product', async () => {
+    it("should throw ForbiddenException when merchant tries to update another merchant's product", async () => {
       jest.spyOn(productModel, 'findById').mockReturnValue({
         exec: jest.fn().mockResolvedValue({
           ...mockProduct,
-          merchantId: 'other-merchant'
+          merchantId: 'other-merchant',
         }),
       } as any);
 
-      await expect(service.update('1', {}, 'merchant-123', 'MERCHANT')).rejects.toThrow(ForbiddenException);
+      await expect(service.update('1', {}, 'merchant-123', 'MERCHANT')).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 
@@ -252,11 +256,11 @@ describe('ProductsService', () => {
     it('should remove a product, delete from Elasticsearch, and invalidate cache', async () => {
       const userId = 'merchant-123';
       const userRole = 'MERCHANT';
-      
+
       jest.spyOn(productModel, 'findById').mockReturnValue({
         exec: jest.fn().mockResolvedValue(mockProduct),
       } as any);
-      
+
       jest.spyOn(productModel, 'findByIdAndDelete').mockReturnValue({
         exec: jest.fn().mockResolvedValue(mockProduct),
       } as any);
@@ -267,7 +271,7 @@ describe('ProductsService', () => {
         index: 'products',
         id: '1',
       });
-      
+
       // Verify cache invalidation
       expect(cacheManager.del).toHaveBeenCalledWith('product:1');
       expect(cacheManager.del).toHaveBeenCalledWith('products:all');
@@ -279,18 +283,22 @@ describe('ProductsService', () => {
         exec: jest.fn().mockResolvedValue(null),
       } as any);
 
-      await expect(service.remove('999', 'merchant-123', 'MERCHANT')).rejects.toThrow(NotFoundException);
+      await expect(service.remove('999', 'merchant-123', 'MERCHANT')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
-    it('should throw ForbiddenException when merchant tries to delete another merchant\'s product', async () => {
+    it("should throw ForbiddenException when merchant tries to delete another merchant's product", async () => {
       jest.spyOn(productModel, 'findById').mockReturnValue({
         exec: jest.fn().mockResolvedValue({
           ...mockProduct,
-          merchantId: 'other-merchant'
+          merchantId: 'other-merchant',
         }),
       } as any);
 
-      await expect(service.remove('1', 'merchant-123', 'MERCHANT')).rejects.toThrow(ForbiddenException);
+      await expect(service.remove('1', 'merchant-123', 'MERCHANT')).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 
@@ -298,10 +306,10 @@ describe('ProductsService', () => {
     it('should return search results from cache when available', async () => {
       const query = 'test';
       const searchResults = [mockProduct];
-      
+
       // Mock cache hit
       mockCacheManager.get.mockResolvedValue(searchResults);
-      
+
       const result = await service.search(query);
 
       expect(result).toEqual(searchResults);
@@ -321,22 +329,24 @@ describe('ProductsService', () => {
           ],
         },
       };
-      
+
       // Mock cache miss
       mockCacheManager.get.mockResolvedValue(null);
       mockElasticsearchService.search.mockResolvedValue(searchResults);
-      
+
       const result = await service.search(query);
 
-      expect(result).toEqual([{
-        _id: '1',
-        name: mockProduct.name,
-        description: mockProduct.description,
-        price: mockProduct.price,
-        category: mockProduct.category,
-        tags: mockProduct.tags,
-        merchantId: mockProduct.merchantId
-      }]);
+      expect(result).toEqual([
+        {
+          _id: '1',
+          name: mockProduct.name,
+          description: mockProduct.description,
+          price: mockProduct.price,
+          category: mockProduct.category,
+          tags: mockProduct.tags,
+          merchantId: mockProduct.merchantId,
+        },
+      ]);
       expect(cacheManager.get).toHaveBeenCalledWith(`search:${query}`);
       expect(elasticsearchService.search).toHaveBeenCalledWith({
         index: 'products',
@@ -356,10 +366,10 @@ describe('ProductsService', () => {
     it('should return products from cache when available', async () => {
       const category = 'Test Category';
       const products = [mockProduct];
-      
+
       // Mock cache hit
       mockCacheManager.get.mockResolvedValue(products);
-      
+
       const result = await service.findByCategory(category);
 
       expect(result).toEqual(products);
@@ -370,13 +380,13 @@ describe('ProductsService', () => {
     it('should fetch products from database and store in cache when cache misses', async () => {
       const category = 'Test Category';
       const products = [mockProduct];
-      
+
       // Mock cache miss
       mockCacheManager.get.mockResolvedValue(null);
       jest.spyOn(productModel, 'find').mockReturnValue({
         exec: jest.fn().mockResolvedValue(products),
       } as any);
-      
+
       const result = await service.findByCategory(category);
 
       expect(result).toEqual(products);
@@ -390,10 +400,10 @@ describe('ProductsService', () => {
     it('should return products from cache when available', async () => {
       const tags = ['test', 'product'];
       const products = [mockProduct];
-      
+
       // Mock cache hit
       mockCacheManager.get.mockResolvedValue(products);
-      
+
       const result = await service.findByTags(tags);
 
       expect(result).toEqual(products);
@@ -404,19 +414,22 @@ describe('ProductsService', () => {
     it('should fetch products from database and store in cache when cache misses', async () => {
       const tags = ['test', 'product'];
       const products = [mockProduct];
-      
+
       // Mock cache miss
       mockCacheManager.get.mockResolvedValue(null);
       jest.spyOn(productModel, 'find').mockReturnValue({
         exec: jest.fn().mockResolvedValue(products),
       } as any);
-      
+
       const result = await service.findByTags(tags);
 
       expect(result).toEqual(products);
       expect(cacheManager.get).toHaveBeenCalledWith(`products:tags:${tags.sort().join(',')}`);
       expect(productModel.find).toHaveBeenCalled();
-      expect(cacheManager.set).toHaveBeenCalledWith(`products:tags:${tags.sort().join(',')}`, products);
+      expect(cacheManager.set).toHaveBeenCalledWith(
+        `products:tags:${tags.sort().join(',')}`,
+        products,
+      );
     });
   });
 
@@ -424,10 +437,10 @@ describe('ProductsService', () => {
     it('should return products from cache when available', async () => {
       const merchantId = 'merchant-123';
       const products = [mockProduct];
-      
+
       // Mock cache hit
       mockCacheManager.get.mockResolvedValue(products);
-      
+
       const result = await service.findByMerchant(merchantId);
 
       expect(result).toEqual(products);
@@ -438,13 +451,13 @@ describe('ProductsService', () => {
     it('should fetch products from database and store in cache when cache misses', async () => {
       const merchantId = 'merchant-123';
       const products = [mockProduct];
-      
+
       // Mock cache miss
       mockCacheManager.get.mockResolvedValue(null);
       jest.spyOn(productModel, 'find').mockReturnValue({
         exec: jest.fn().mockResolvedValue(products),
       } as any);
-      
+
       const result = await service.findByMerchant(merchantId);
 
       expect(result).toEqual(products);

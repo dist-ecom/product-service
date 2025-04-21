@@ -29,4 +29,4 @@ async function generateAdminToken() {
 }
 
 // Run the function
-generateAdminToken().catch(console.error); 
+generateAdminToken().catch(console.error);

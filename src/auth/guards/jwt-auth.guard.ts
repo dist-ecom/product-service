@@ -14,11 +14,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (err) {
       this.logger.error(`Authentication error: ${err.message}`);
     }
-    
+
     if (err || !user) {
       throw err || new UnauthorizedException('Unauthorized');
     }
-    
+
     return user;
   }
 }
