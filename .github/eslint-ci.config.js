@@ -41,24 +41,24 @@ module.exports = [
       '@typescript-eslint/interface-name-prefix': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
 
-      // Type safety balancing - downgraded from warn to off to be more lenient
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-unsafe-return': 'off',
+      // Type safety balancing - upgraded to errors for CI
+      '@typescript-eslint/no-unsafe-call': 'error',
+      '@typescript-eslint/no-unsafe-member-access': 'error',
+      '@typescript-eslint/no-unsafe-assignment': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'error',
+      '@typescript-eslint/no-unsafe-return': 'error',
       
       // This causes issues with common patterns like controller methods
-      '@typescript-eslint/unbound-method': 'off',
+      '@typescript-eslint/unbound-method': 'error',
       
-      // Async/await validation can be overly strict
-      '@typescript-eslint/require-await': 'off',
+      // Async/await validation
+      '@typescript-eslint/require-await': 'error',
       
       // Important to catch unused variables but with reasonable exceptions
-      'no-unused-vars': 'off', // Turn off base rule
-      '@typescript-eslint/no-unused-vars': ['warn', { 
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', {
         'argsIgnorePattern': '^_|req|res|next|args|context|info',
         'varsIgnorePattern': '^_|props|state|context|styles',
         'caughtErrorsIgnorePattern': '^_|error|err|e',
@@ -67,20 +67,20 @@ module.exports = [
       }],
       
       // Additional reasonable rules
-      'prefer-const': 'warn',
-      'no-console': ['warn', { allow: ['warn', 'error', 'info', 'debug'] }],
-      'no-duplicate-imports': 'warn',
-      'no-return-await': 'off', // TypeScript handles this better
-      '@typescript-eslint/ban-ts-comment': 'warn',
-      '@typescript-eslint/no-floating-promises': ['warn', {
-        'ignoreVoid': true, // Allow void operator for promises
+      'prefer-const': 'error',
+      'no-console': ['error', { allow: ['warn', 'error'] }],
+      'no-duplicate-imports': 'error',
+      'no-return-await': 'off',
+      '@typescript-eslint/ban-ts-comment': 'error',
+      '@typescript-eslint/no-floating-promises': ['error', {
+        'ignoreVoid': true,
       }],
       
-      // Downgrade some more rules to be more lenient
-      '@typescript-eslint/no-empty-function': 'off',
-      '@typescript-eslint/no-inferrable-types': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
-      'no-case-declarations': 'off'
+      // Stricter rules for CI
+      '@typescript-eslint/no-empty-function': 'error',
+      '@typescript-eslint/no-inferrable-types': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'error',
+      'no-case-declarations': 'error'
     }
   },
   // Test files with more lenient rules
@@ -97,7 +97,6 @@ module.exports = [
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'no-console': 'off',
-      // Disable additional rules for tests
       '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/no-floating-promises': 'off'
     }
