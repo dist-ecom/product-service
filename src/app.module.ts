@@ -4,6 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
 import { AuthModule } from './auth/auth.module';
 import { RedisCacheModule } from './cache/cache.module';
+import { ServiceDiscoveryModule } from './service-discovery/service-discovery.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { RedisCacheModule } from './cache/cache.module';
     RedisCacheModule,
     ProductsModule,
     AuthModule,
+    ServiceDiscoveryModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
