@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.17.1",
+    "@nestjs/axios": "^4.0.0",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.0.0",
@@ -41,7 +42,7 @@
     "@nestjs/passport": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.0.0",
-    "axios": "^1.8.4",
+    "axios": "^1.9.0",
     "cache-manager": "^6.4.2",
     "cache-manager-redis-store": "^3.0.1",
     "class-transformer": "^0.5.1",

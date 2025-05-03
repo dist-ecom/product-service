@@ -7,7 +7,9 @@ import { CacheModule } from '../cache/cache.module';
 @Module({
   imports: [
     MongooseModule,
-    ElasticsearchModule,
+    ElasticsearchModule.register({
+      node: process.env.ELASTICSEARCH_NODE || 'http://localhost:9200',
+    }),
     CacheModule,
   ],
   controllers: [HealthController],
