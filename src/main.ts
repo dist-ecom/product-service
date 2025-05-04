@@ -84,7 +84,11 @@ async function bootstrap() {
         Check: {
           HTTP: `http://${serviceAddress}:${port}/health`,
           Interval: '15s'
-        }
+        },
+        Tags: ['api', 'product-service', 'nestjs'],
+        Meta: {
+          Description: serviceDescription,
+        },
       };
       
       logger.log(`Registering service with Consul at: ${serviceRegistryUrl}`);
